@@ -1,6 +1,6 @@
 <?php
 
-namespace Tapp\FilamentAuditing\RelationManagers;
+namespace Jmitech\FilamentAuditing\RelationManagers;
 
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;

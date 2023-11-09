@@ -1,6 +1,6 @@
 <?php
 
-namespace Tapp\FilamentAuditing;
+namespace Jmitech\FilamentAuditing;
 
 use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPackageTools\Package;

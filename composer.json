@@ -1,8 +1,7 @@
 {
-    "name": "tapp/filament-auditing",
+    "name": "jmitech/filament-auditing",
     "description": "Filament Laravel Auditing plugin.",
     "keywords": [
-        "tapp network",
         "filament",
         "laravel",
         "auditing",
@@ -19,12 +18,17 @@
             "name": "Tapp Network",
             "email": "andreia.bohner@tappnetwork.com",
             "role": "Developer"
+        },
+        {
+            "name": "JMI TECHNOLOGIES INC.",
+            "email": "jean-michel.caron@jmitechnologies.com",
+            "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/TappNetwork/filament-auditing",
+    "homepage": "https://github.com/jmitech/filament-auditing",
     "support": {
-        "issues": "https://github.com/TappNetwork/filament-auditing/issues",
-        "source": "https://github.com/TappNetwork/filament-auditing"
+        "issues": "https://github.com/jmitech/filament-auditing/issues",
+        "source": "https://github.com/jmitech/filament-auditing"
     },
     "require": {
         "php": "^8.1",
@@ -37,7 +41,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Tapp\\FilamentAuditing\\": "src"
+            "Jmitech\\FilamentAuditing\\": "src"
         }
     },
     "config": {
@@ -46,7 +50,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Tapp\\FilamentAuditing\\FilamentAuditingServiceProvider"
+                "Jmitech\\FilamentAuditing\\FilamentAuditingServiceProvider"
             ]
         }
     },
