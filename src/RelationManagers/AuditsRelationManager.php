@@ -2,6 +2,7 @@
 
 namespace Jmitech\FilamentAuditing\RelationManagers;
 
+use App\Interfaces\Models\Translatable;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use OwenIt\Auditing\Contracts\Audit;
 
 class AuditsRelationManager extends RelationManager
@@ -20,15 +22,18 @@ class AuditsRelationManager extends RelationManager
 
     protected $listeners = ['updateAuditsRelationManager' => '$refresh'];
 
+
     public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
     {
         return auth()->user()->can('audit', $ownerRecord);
     }
 
+
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return trans('filament-auditing::filament-auditing.table.heading');
     }
+
 
     public function table(Table $table): Table
     {
@@ -72,6 +77,7 @@ class AuditsRelationManager extends RelationManager
             ]);
     }
 
+
     protected static function extraColumns()
     {
         return Arr::map(config('filament-auditing.audits_extend'), function ($buildParameters, $columnName) {
@@ -79,7 +85,7 @@ class AuditsRelationManager extends RelationManager
                 function ($collection) use ($columnName) {
                     $columnClass = (string) $collection->get('class');
 
-                    if (! is_null($collection->get('methods'))) {
+                    if (!is_null($collection->get('methods'))) {
                         $columnClass = $columnClass::make($columnName);
 
                         collect($collection->get('methods'))->transform(function ($value, $key) use ($columnClass) {
@@ -99,13 +105,14 @@ class AuditsRelationManager extends RelationManager
         });
     }
 
+
     protected static function restoreAuditSelected($audit)
     {
         $morphClass = Relation::getMorphedModel($audit->auditable_type) ?? $audit->auditable_type;
 
         $record = $morphClass::find($audit->auditable_id);
 
-        if (! $record) {
+        if (!$record) {
             self::unchangedAuditNotification();
 
             return;
@@ -119,19 +126,29 @@ class AuditsRelationManager extends RelationManager
 
         $restore = $audit->old_values;
 
+
         Arr::pull($restore, 'id');
 
         if (is_array($restore)) {
 
             foreach ($restore as $key => $item) {
+
                 $decode = json_decode($item);
+                $defaultlang = app()->getLocale();
 
                 if (json_last_error() === JSON_ERROR_NONE) {
                     $restore[$key] = $decode;
                 }
+                // Check if Model is Translatable, then check if array has default language key
+                if ($record instanceof Translatable and isset($decode->$defaultlang)) { // App's Translatable Interface
+                    foreach ($decode as $lang => $value)
+                        // Set translation via Spatie/Translate
+                        $record->setTranslation($key, $lang, $value);
+                } else {
+                    $record->fill($restore);
+                }
             }
 
-            $record->fill($restore);
             $record->save();
 
             self::restoredAuditNotification();
@@ -142,6 +159,7 @@ class AuditsRelationManager extends RelationManager
         self::unchangedAuditNotification();
     }
 
+
     protected static function restoredAuditNotification()
     {
         Notification::make()
@@ -149,6 +167,7 @@ class AuditsRelationManager extends RelationManager
             ->success()
             ->send();
     }
+
 
     protected static function unchangedAuditNotification()
     {
@@ -158,15 +177,18 @@ class AuditsRelationManager extends RelationManager
             ->send();
     }
 
+
     protected function canCreate(): bool
     {
         return false;
     }
 
+
     protected function canEdit(Model $record): bool
     {
         return false;
     }
+
 
     protected function canDelete(Model $record): bool
     {
